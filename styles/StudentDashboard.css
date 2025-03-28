@@ -11,7 +11,7 @@
     padding: 0;
     box-sizing: border-box;
   }
-    
+
   .student-dashboard {
     display: flex;
     min-height: 100vh;
@@ -99,10 +99,10 @@
     transition: all 0.3s ease;
   }
   
-  .question-card:hover {
+  /* .question-card:hover {
     box-shadow: 0 10px 20px rgba(74, 108, 247, 0.1);
     transform: translateY(-5px);
-  }
+  } */
   
   .option-label {
     display: flex;
