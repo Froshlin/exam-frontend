@@ -22,19 +22,20 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      try {
-        const response = await axios.get("https://exam-frontend-liart.vercel.app/api/courses");
-        setCourses(response.data);
-      } catch (error) {
-        toast.error("Failed to fetch courses");
-      }
+        try {
+            const response = await axios.get("https://exam-backend.up.railway.app/api/courses");
+            setCourses(response.data);
+          } catch (error) {
+            console.error("Courses fetch error:", error.response ? error.response.data : error.message);
+            toast.error(`Failed to fetch courses: ${error.message}`);
+          }
     };
     fetchCourses();
   }, []);
 
   const startExam = async (courseId) => {
     try {
-      const response = await axios.get(`https://exam-frontend-liart.vercel.app/api/exam/${courseId}`);
+      const response = await axios.get(`https://exam-backend.up.railway.app/api/questions/${courseId}`);
       setExamQuestions(response.data);
       setSelectedCourse(courseId);
       setAnswers({});
@@ -45,7 +46,7 @@ export default function StudentDashboard() {
 
   const submitExam = async () => {
     try {
-      const response = await axios.post(`https://exam-frontend-liart.vercel.app/api/exam/${selectedCourse}/submit`, { answers });
+      const response = await axios.post(`https://exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`, { answers });
       const newGrades = {...grades};
       newGrades[selectedCourse] = response.data.score;
       setGrades(newGrades);
