@@ -8,10 +8,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  devIndicators: {
-    buildActivity: false,
-    // buildActivityPosition: 'bottom-right'
-  }
 };
 
 export default nextConfig;

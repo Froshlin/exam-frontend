@@ -1,0 +1,12 @@
+.admin-dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f7f6;
+  }
+  
+  .admin-main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    overflow-y: auto;
+  }
