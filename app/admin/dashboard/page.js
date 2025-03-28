@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/courses");
+        const response = await axios.get("https://exam-backend.up.railway.app/api/courses");
         setCourses(response.data);
       } catch (error) {
         toast.error("Failed to fetch courses", {
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
     };
 
     try {
-      await axios.post("http://localhost:8000/api/questions", newQuestion);
+      await axios.post("https://exam-backend.up.railway.app/api/questions", newQuestion);
 
       toast.success("Question Added Successfully!", {
         position: "top-right",
