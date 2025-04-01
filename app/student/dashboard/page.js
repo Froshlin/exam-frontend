@@ -45,18 +45,28 @@ export default function StudentDashboard() {
   };
 
   const submitExam = async () => {
+    console.log("Submitting answers:", { answers });
+  
     try {
-      const response = await axios.post(`https://exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`, { answers });
-      const newGrades = {...grades};
+      const response = await axios.post(
+        `https://exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`, 
+        { answers }
+      );
+  
+      console.log("Submission response:", response.data);
+  
+      const newGrades = { ...grades };
       newGrades[selectedCourse] = response.data.score;
       setGrades(newGrades);
       setExamQuestions([]);
       setSelectedCourse(null);
       toast.success(`Exam completed! Score: ${response.data.score.toFixed(2)}%`);
     } catch (error) {
+      console.error("Submission error:", error.response ? error.response.data : error.message);
       toast.error("Failed to submit exam");
     }
   };
+  
 
   const handleAnswerSelect = (questionId, selectedOption) => {
     setAnswers({...answers, [questionId]: selectedOption});
