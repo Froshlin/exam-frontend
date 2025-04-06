@@ -1,15 +1,17 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
-import "../styles/auth.css"; // Import external CSS
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import "../styles/auth.css";
 
-export default function Register() {
+export default function StudentRegister() {
   const [credentials, setCredentials] = useState({
-    role: "student",
     matricNumber: "",
-    email: "",
     password: "",
+    confirmPassword: ""
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -23,80 +25,68 @@ export default function Register() {
     e.preventDefault();
     setError("");
     setSuccess("");
-  
+
     // Validate inputs before sending
-    if (credentials.role === "student" && !credentials.matricNumber) {
-      setError("Matric Number is required for students");
+    if (!credentials.matricNumber) {
+      setError("Matric Number is required");
+      toast.error("Matric Number is required");
       return;
     }
-  
-    if (credentials.role === "admin" && !credentials.email) {
-      setError("Email is required for admins");
+    
+    if (!credentials.password) {
+      setError("Password is required");
+      toast.error("Password is required");
       return;
     }
-  
+    
+    if (credentials.password !== credentials.confirmPassword) {
+      setError("Passwords do not match");
+      toast.error("Passwords do not match");
+      return;
+    }
+
     try {
-        const userData = {
-            role: credentials.role,
-            password: credentials.password,
-            ...(credentials.role === "student" 
-              ? { matricNumber: credentials.matricNumber }
-              : { email: credentials.email })
-          };
-  
-      console.log('Sending user data:', userData); // Log the data being sent
-  
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        userData
-      );
-      
+      const response = await axios.post("http://localhost:8000/api/auth/register", {
+        role: "student",
+        matricNumber: credentials.matricNumber,
+        password: credentials.password,
+      });
+
       setSuccess("Registration successful! Redirecting...");
+      toast.success("Registration successful! Redirecting...");
+
+      // Store the token if returned
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("role", "student");
+      }
+
       setTimeout(() => {
         router.push("/login");
       }, 2000);
     } catch (err) {
       console.error('Registration error:', err.response?.data);
-      setError(err.response?.data?.message || "Registration failed");
+      const errorMessage = err.response?.data?.message || "Registration failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Register</h2>
+        <h2>Student Registration</h2>
         {error && <p className="error-text">{error}</p>}
         {success && <p className="success-text">{success}</p>}
         <form onSubmit={handleSubmit}>
-          <select
-            name="role"
-            value={credentials.role}
+          <input
+            type="text"
+            name="matricNumber"
+            placeholder="Matric Number"
+            value={credentials.matricNumber}
             onChange={handleChange}
             className="form-input"
-          >
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
-
-          {credentials.role === "student" ? (
-            <input
-              type="text"
-              name="matricNumber"
-              placeholder="Matric Number"
-              value={credentials.matricNumber}
-              onChange={handleChange}
-              className="form-input"
-            />
-          ) : (
-            <input
-              type="email"
-              name="email"
-              placeholder="Admin Email"
-              value={credentials.email}
-              onChange={handleChange}
-              className="form-input"
-            />
-          )}
+          />
 
           <input
             type="password"
@@ -106,12 +96,26 @@ export default function Register() {
             onChange={handleChange}
             className="form-input"
           />
+          
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={credentials.confirmPassword}
+            onChange={handleChange}
+            className="form-input"
+          />
 
           <button type="submit" className="submit-button">
             Register
           </button>
+          
+          <div className="auth-links">
+            <Link href="/login">Already have an account? Login</Link>
+          </div>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 }

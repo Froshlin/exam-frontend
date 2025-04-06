@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import "../../../styles/StudentDashboard.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,38 +20,92 @@ export default function StudentDashboard() {
   const [examQuestions, setExamQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [grades, setGrades] = useState({});
+  const [user, setUser] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(35 * 60); // 35 minutes in seconds
+  const router = useRouter();
 
+  // Fetch user details and courses on mount
   useEffect(() => {
-    const fetchCourses = async () => {
-        try {
-            const response = await axios.get("https://exam-backend.up.railway.app/api/courses");
-            setCourses(response.data);
-          } catch (error) {
-            console.error("Courses fetch error:", error.response ? error.response.data : error.message);
-            toast.error(`Failed to fetch courses: ${error.message}`);
-          }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data);
+      } catch (error) {
+        toast.error('Session expired. Please login again.');
+        localStorage.removeItem('token');
+        router.push('/login');
+      }
     };
+
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/courses', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log('Fetched courses:', response.data);
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Courses fetch error:", error.response ? error.response.data : error.message);
+        toast.error(`Failed to fetch courses: ${error.message}`);
+      }
+    };
+
+    fetchUser();
     fetchCourses();
-  }, []);
+  }, [router]);
+
+  // Timer logic
+  useEffect(() => {
+    if (examQuestions.length === 0 || timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          submitExam(); // Auto-submit when time is up
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [examQuestions, timeLeft]);
 
   const startExam = async (courseId) => {
+    const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`https://exam-backend.up.railway.app/api/questions/${courseId}`);
+      const response = await axios.get(`http://localhost:8000/api/questions/${courseId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('Fetched questions for courseId:', courseId, response.data);
       setExamQuestions(response.data);
       setSelectedCourse(courseId);
       setAnswers({});
+      setTimeLeft(35 * 60); // Reset timer to 35 minutes
     } catch (error) {
+      console.error('Error fetching exam questions:', error.response ? error.response.data : error.message);
       toast.error("Failed to fetch exam questions");
     }
   };
 
   const submitExam = async () => {
-    console.log("Submitting answers:", { answers });
+    const token = localStorage.getItem('token');
+    console.log("Submitting answers:", answers);
   
     try {
       const response = await axios.post(
-        `https://exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`, 
-        { answers }
+        `http://localhost:8000/api/exam/${selectedCourse}/submit`, 
+        { answers },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
   
       console.log("Submission response:", response.data);
@@ -60,16 +115,28 @@ export default function StudentDashboard() {
       setGrades(newGrades);
       setExamQuestions([]);
       setSelectedCourse(null);
+      setTimeLeft(0); // Reset timer
       toast.success(`Exam completed! Score: ${response.data.score.toFixed(2)}%`);
     } catch (error) {
-      console.error("Submission error:", error.response ? error.response.data : error.message);
+      console.error("Submission error:", {
+        message: error.message,
+        response: error.response ? error.response.data : null,
+        status: error.response ? error.response.status : null,
+      });
       toast.error("Failed to submit exam");
     }
   };
-  
 
   const handleAnswerSelect = (questionId, selectedOption) => {
     setAnswers({...answers, [questionId]: selectedOption});
+    console.log('Selected answer:', { questionId, selectedOption });
+  };
+
+  // Format time as MM:SS
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
@@ -101,6 +168,9 @@ export default function StudentDashboard() {
         {examQuestions.length > 0 ? (
           <div className="exam-container">
             <h2>Exam: {selectedCourse}</h2>
+            <div style={{ marginBottom: '20px', fontWeight: 'bold', color: timeLeft <= 300 ? 'red' : 'black' }}>
+              Time Left: {formatTime(timeLeft)}
+            </div>
             {examQuestions.map((question, index) => (
               <div key={question._id} className="question-card">
                 <p>{question.text}</p>
@@ -118,11 +188,13 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ))}
-            <button onClick={submitExam}>Submit Exam</button>
+            <button onClick={submitExam} disabled={timeLeft <= 0}>
+              Submit Exam
+            </button>
           </div>
         ) : (
           <div className="welcome-message">
-            <h2>Welcome to Student Dashboard</h2>
+            <h2>Welcome to Student Dashboard, {user?.matricNumber || 'Student'}</h2>
             <p>Select a course from the sidebar to start an exam</p>
           </div>
         )}

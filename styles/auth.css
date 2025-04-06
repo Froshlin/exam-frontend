@@ -1,64 +1,173 @@
-*{
+/* Global Reset & Font */
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
 
-/* Center the login container */
+/* Container */
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f3f4f6; /* Tailwind gray-100 */
-}
-
-/* Card Styling */
-.auth-card {
-  background: white;
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  animation: fadeIn 1s ease-in-out;
 }
 
-/* Form Input Fields */
+/* Card */
+.auth-card {
+  background: #ffffff;
+  padding: 2.75rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideUp 0.6s ease;
+}
+
+/* Heading */
+.auth-card h2 {
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+/* Inputs */
 .form-input {
   width: 100%;
-  padding: 12px 3px;
-  margin-bottom: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
   font-size: 1rem;
+  background-color: #f1f5f9;
+  transition: all 0.3s ease;
 }
 
-/* Submit Button */
+.form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+/* Button */
 .submit-button {
   width: 100%;
-  background-color: #2563eb; /* Tailwind blue-500 */
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
+  padding: 14px;
   font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: #fff;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
 }
 
 .submit-button:hover {
-  background-color: #1e40af; /* Tailwind blue-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
-/* Error Message */
-.error-message {
-  color: red;
-  font-size: 0.875rem;
+.submit-button:active {
+  transform: translateY(0);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border-left-color: #2563eb;
+  animation: spin 0.8s linear infinite;
+  margin: 16px auto;
+}
+
+/* Anchor Links */
+.auth-links a {
+  color: #2563eb; /* Tailwind blue-500 */
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.auth-links a:hover {
+  color: #1e40af; /* Tailwind blue-700 */
+  transform: translateY(-2px);
+}
+
+.auth-links a:active {
+  transform: translateY(0);
+}
+
+/* Underline effect on hover */
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Text States */
+.error-text,
+.success-text {
+  font-size: 0.95rem;
   margin-bottom: 1rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
 }
 
-.nextjs-toast{
-  display: none !important;
+.error-text {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+}
+
+.success-text {
+  background-color: #d1fae5;
+  color: #059669;
+  border-left: 4px solid #059669;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+  }
 }

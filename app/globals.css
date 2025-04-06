@@ -5,6 +5,11 @@
   box-sizing: border-box;
 }
 
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

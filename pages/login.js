@@ -1,18 +1,19 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "../styles/auth.css";
 
-export default function Login() {
+export default function StudentLogin() {
   const [credentials, setCredentials] = useState({
-    role: "student",
     matricNumber: "",
-    email: "",
     password: "",
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -22,88 +23,63 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
-    try {
-      const userData = {
-        role: credentials.role,
-        password: credentials.password,
-        ...(credentials.role === "admin"
-          ? { email: credentials.email }
-          : { matricNumber: credentials.matricNumber }),
-      };
-  
-      console.log('Exact Login Payload:', JSON.stringify(userData, null, 2));
-  
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-        userData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+    setSuccess("");
 
-      // Extract token from response
-      const { token, role } = res.data;
-
-      // Save token to localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
-
-      // Redirect based on role
-      if (role === 'student') {
-        router.push('/student/dashboard');
-      } else if (role === 'admin') {
-        router.push('/admin/dashboard');
-      }
-    } catch (err) {
-      console.error('Full Axios Error:', err);
-      console.error('Error Response:', err.response?.data);
-      console.error('Error Status:', err.response?.status);
-      setError(err.response?.data?.message || "Login failed");
+    // Validate inputs before sending
+    if (!credentials.matricNumber) {
+      setError("Matric Number is required");
+      toast.error("Matric Number is required");
+      return;
     }
-  };
+    
+    if (!credentials.password) {
+      setError("Password is required");
+      toast.error("Password is required");
+      return;
+    }
 
-  const handleRegisterRedirect = () => {
-    router.push('/register');
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/login", {
+        role: "student",
+        matricNumber: credentials.matricNumber,
+        password: credentials.password,
+      });
+
+      setSuccess("Login successful! Redirecting...");
+      toast.success("Login successful! Redirecting...");
+
+      // Store the token
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("role", "student");
+      }
+
+      setTimeout(() => {
+        router.push("/student/dashboard");
+      }, 2000);
+    } catch (err) {
+      console.error('Login error:', err.response?.data);
+      const errorMessage = err.response?.data?.message || "Login failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Login</h2>
-        {error && <p className="error-message">{error}</p>}
-        <form onSubmit={handleSubmit} className="login-form">
-          <select
-            name="role"
-            value={credentials.role}
+        <h2>Student Login</h2>
+        {error && <p className="error-text">{error}</p>}
+        {success && <p className="success-text">{success}</p>}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="matricNumber"
+            placeholder="Matric Number"
+            value={credentials.matricNumber}
             onChange={handleChange}
             className="form-input"
-          >
-            <option value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
-
-          {credentials.role === "student" ? (
-            <input
-              type="text"
-              name="matricNumber"
-              placeholder="Matric Number"
-              value={credentials.matricNumber}
-              onChange={handleChange}
-              className="form-input"
-            />
-          ) : (
-            <input
-              type="email"
-              name="email"
-              placeholder="Admin Email"
-              value={credentials.email}
-              onChange={handleChange}
-              className="form-input"
-            />
-          )}
+          />
 
           <input
             type="password"
@@ -114,19 +90,16 @@ export default function Login() {
             className="form-input"
           />
 
-          <button type="submit" className="submit-button">Login</button>
+          <button type="submit" className="submit-button">
+            Login
+          </button>
+          
+          <div className="auth-links">
+            <Link href="/register">Don't have an account? Register</Link>
+          </div>
         </form>
-         {/* Pure CSS Registration Link */}
-         <div style={{
-          marginTop: '20px', 
-          textAlign: 'center',
-          color: '#007bff',
-          cursor: 'pointer',
-          textDecoration: 'underline'
-        }} onClick={handleRegisterRedirect}>
-          Don't have an account? Register here
-        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
