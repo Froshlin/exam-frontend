@@ -1,11 +1,13 @@
+// student/dashboard/page.js
 "use client";
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import "../../../styles/StudentDashboard.css";
+import axiosInstance from "../../utils/axiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import {
   BookOpen,
   GraduationCap,
@@ -13,7 +15,10 @@ import {
   ClipboardList,
   BookmarkCheck,
   LogOut,
+  Menu,
+  X,
 } from "lucide-react";
+import "../../../styles/StudentDashboard.css";
 
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
@@ -21,10 +26,12 @@ export default function StudentDashboard() {
   const [examQuestions, setExamQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [user, setUser] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(35 * 60); // 35 minutes in seconds
+  const [grades, setGrades] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(35 * 60);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar toggle
   const router = useRouter();
 
-  // Fetch user details and courses on mount
+  // Fetch user details, courses, and grades on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -34,14 +41,14 @@ export default function StudentDashboard() {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          "https://exam-backend.up.railway.app/api/auth/me",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axiosInstance.get("/auth/me");
         console.log("Fetched user:", response.data);
         setUser(response.data);
+
+        // Fetch grades for the student
+        const gradesResponse = await axiosInstance.get(`/grades/student/${response.data.id}`);
+        console.log("Fetched grades:", gradesResponse.data);
+        setGrades(gradesResponse.data);
       } catch (error) {
         console.error("Fetch user error:", error);
         toast.error("Session expired. Please login again.");
@@ -52,12 +59,7 @@ export default function StudentDashboard() {
 
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(
-          "https://exam-backend.up.railway.app/api/courses",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axiosInstance.get("/courses");
         console.log("Fetched courses:", response.data);
         setCourses(response.data);
       } catch (error) {
@@ -81,7 +83,7 @@ export default function StudentDashboard() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          submitExam(); // Auto-submit when time is up
+          submitExam();
           return 0;
         }
         return prev - 1;
@@ -92,19 +94,18 @@ export default function StudentDashboard() {
   }, [examQuestions, timeLeft]);
 
   const startExam = async (courseId) => {
-    const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(
-        `https://exam-backend.up.railway.app/api/questions/${courseId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axiosInstance.get(`/questions/${courseId}`);
+      if (response.data.length === 0) {
+        toast.error("No questions available for this course");
+        return;
+      }
       console.log("Fetched questions for courseId:", courseId, response.data);
       setExamQuestions(response.data);
       setSelectedCourse(courseId);
       setAnswers({});
-      setTimeLeft(35 * 60); // Reset timer to 35 minutes
+      setTimeLeft(35 * 60);
+      setIsSidebarOpen(false); // Close sidebar when starting an exam
     } catch (error) {
       console.error(
         "Error fetching exam questions:",
@@ -115,34 +116,20 @@ export default function StudentDashboard() {
   };
 
   const submitExam = async () => {
-    const token = localStorage.getItem("token");
     console.log("Submitting answers:", answers);
 
     try {
-      const response = await axios.post(
-        `https://exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`,
-        { answers },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      const response = await axiosInstance.post(`/exam/${selectedCourse}/submit`, { answers });
       console.log("Submission response:", response.data);
 
-      // Refetch user data to get updated grades
-      const userResponse = await axios.get(
-        "https://exam-backend.up.railway.app/api/auth/me",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log("Fetched user after submission:", userResponse.data);
-      setUser(userResponse.data);
+      // Refetch grades after submission
+      const gradesResponse = await axiosInstance.get(`/grades/student/${user.id}`);
+      console.log("Fetched grades after submission:", gradesResponse.data);
+      setGrades(gradesResponse.data);
 
       setExamQuestions([]);
       setSelectedCourse(null);
-      setTimeLeft(0); // Reset timer
-      toast.success(
-        `Exam completed! Score: ${response.data.score.toFixed(2)}%`
-      );
+      setTimeLeft(0);
     } catch (error) {
       console.error("Submission error:", {
         message: error.message,
@@ -158,31 +145,40 @@ export default function StudentDashboard() {
     console.log("Selected answer:", { questionId, selectedOption });
   };
 
-  // Logout function
   const handleLogout = () => {
-    // Clear the token and redirect to login
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
     router.push("/login");
   };
 
-  // Format time as MM:SS
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="student-dashboard">
-      <div className="sidebar">
+      {/* Hamburger Menu for Mobile */}
+      <div className="hamburger-menu">
+        <button onClick={toggleSidebar} className="hamburger-button">
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Sidebar */}
+      <div className={`sidebar ${isSidebarOpen ? "sidebar-open" : ""}`}>
         <h2>
           <GraduationCap size={24} /> Courses
         </h2>
         {courses.map((course) => (
           <div key={course._id} className="sidebar-item">
             <button onClick={() => startExam(course._id)}>
-              <BookOpen size={18} /> {course.name} ({course._id})
+              <BookOpen size={18} /> {course.name}
             </button>
           </div>
         ))}
@@ -190,22 +186,17 @@ export default function StudentDashboard() {
           <h3>
             <Star size={20} /> My Grades
           </h3>
-          {user?.grades?.length > 0 ? (
-            user.grades.map((grade) => {
-              const courseName = courses.find(
-                (c) => c._id === grade.courseId
-              )?.name;
-              return (
-                <div key={grade.courseId} className="grade-item">
-                  <span>
-                    <ClipboardList size={16} /> {courseName || "Unknown Course"}
-                  </span>
-                  <span>
-                    <BookmarkCheck size={16} /> {grade.score.toFixed(2)}%
-                  </span>
-                </div>
-              );
-            })
+          {grades.length > 0 ? (
+            grades.map((grade) => (
+              <div key={grade._id} className="grade-item">
+                <span>
+                  <ClipboardList size={16} /> {grade.courseId.name}
+                </span>
+                <span>
+                  <BookmarkCheck size={16} /> {grade.score.toFixed(2)}%
+                </span>
+              </div>
+            ))
           ) : (
             <p>No grades available yet.</p>
           )}
@@ -217,10 +208,11 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="main-content">
         {examQuestions.length > 0 ? (
           <div className="exam-container">
-            <h2>Exam: {selectedCourse}</h2>
+            <h2>Exam: {courses.find((c) => c._id === selectedCourse)?.name}</h2>
             <div className="countdown-timer">
               <span className={timeLeft <= 300 ? "countdown-warning" : ""}>
                 Time Left: {formatTime(timeLeft)}
@@ -257,11 +249,39 @@ export default function StudentDashboard() {
             </button>
           </div>
         ) : (
-          <div className="welcome-message">
-            <h2>
-              Welcome to Student Dashboard, {user?.matricNumber || "Student"}
-            </h2>
-            <p>Select a course from the sidebar to start an exam</p>
+          <div className="grades-container">
+            {grades.length > 0 ? (
+              <>
+                <h2>Your Exam Results</h2>
+                <div className="grades-grid">
+                  {grades.map((grade) => (
+                    <div key={grade._id} className="grade-card">
+                      <h3>{grade.courseId.name}</h3>
+                      <div className="circular-progress">
+                        <CircularProgressbar
+                          value={grade.score}
+                          text={`${grade.score.toFixed(2)}%`}
+                          styles={buildStyles({
+                            pathColor: grade.score >= 70 ? "#4caf50" : grade.score >= 50 ? "#ffca28" : "#f44336",
+                            textColor: "#333",
+                            trailColor: "#d6d6d6",
+                            textSize: "18px",
+                            pathTransitionDuration: 0.5,
+                          })}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="welcome-message">
+                <h2>
+                  Welcome to Student Dashboard, {user?.matricNumber || "Student"}
+                </h2>
+                <p>Select a course from the sidebar to start an exam</p>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,3 +1,4 @@
+/* styles/StudentDashboard.css */
 :root {
   --primary-color: #4a6cf7;
   --secondary-color: #6a7aed;
@@ -19,18 +20,43 @@
   font-family: 'Inter', sans-serif;
 }
 
+/* Hamburger Menu */
+.hamburger-menu {
+  display: none; /* Hidden on desktop */
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+}
+
+.hamburger-button {
+  background: var(--primary-color);
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-button:hover {
+  background: var(--secondary-color);
+}
+
+/* Sidebar */
 .sidebar {
   width: 280px;
   background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
   padding: 30px 20px;
   box-shadow: 0 10px 30px rgba(74, 108, 247, 0.2);
   color: var(--white);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   overflow-y: auto;
-  scrollbar-width: 4px;
+  scrollbar-width: thin;
   scrollbar-color: var(--primary-color);
   scroll-behavior: smooth;
-
 }
 
 .sidebar h2 {
@@ -79,65 +105,9 @@
   padding: 10px 15px;
 }
 
-.main-content {
-  flex-grow: 1;
-  padding: 40px;
-  background: transparent;
-  overflow-y: auto;
-}
-
-.exam-container {
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  position: relative;
-}
-
-.question-card {
-  background-color: #f6f8fc;
-  border: 1px solid #dee3f0;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-}
-
-.countdown-timer {
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  background: #edf2fa;
-  color: #1a237e;
-  padding: 10px 20px;
-  font-weight: 600;
-  border-radius: 30px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-.countdown-warning {
-  color: #d32f2f !important;
-  /* red for low time */
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-
 .logout-section {
   margin-top: 20px;
-  border-top: 1px solid #444;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 10px;
 }
 
@@ -160,6 +130,70 @@
   background-color: #e63946;
 }
 
+/* Main Content */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  background: transparent;
+  overflow-y: auto;
+}
+
+.exam-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  position: relative;
+}
+
+.exam-container h2 {
+  margin: 0 0 20px;
+  font-size: 1.8rem;
+  color: var(--primary-color);
+}
+
+.countdown-timer {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: #edf2fa;
+  color: #1a237e;
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.countdown-warning {
+  color: #d32f2f !important;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.question-card {
+  background-color: #ffffff; /* Solid white background */
+  border: 1px solid #dee3f0;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.question-card p {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
 .option-label {
   display: flex;
   align-items: center;
@@ -180,6 +214,26 @@
   height: 18px;
 }
 
+.exam-container button {
+  padding: 10px 20px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.exam-container button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.exam-container button:hover:not(:disabled) {
+  background: var(--secondary-color);
+}
+
 .welcome-message {
   text-align: center;
   color: var(--primary-color);
@@ -190,34 +244,129 @@
   box-shadow: 0 20px 50px rgba(74, 108, 247, 0.1);
 }
 
+.grades-container {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.grades-container h2 {
+  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #3b5998;
+}
+
+.grades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.grade-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.grade-card h3 {
+  margin: 0 0 15px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.circular-progress {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .student-dashboard {
     flex-direction: column;
+    position: relative;
+  }
+
+  .hamburger-menu {
+    display: block; /* Show hamburger menu on mobile */
   }
 
   .sidebar {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    transform: translateX(-100%); /* Hidden by default */
+    z-index: 999;
   }
 
-  .sidebar h2 {
-    width: 100%;
-    text-align: center;
-  }
-
-  .sidebar-item {
-    flex: 1;
+  .sidebar.sidebar-open {
+    transform: translateX(0); /* Show sidebar when open */
   }
 
   .main-content {
     padding: 20px;
+    margin-top: 60px; /* Space for hamburger menu */
   }
 
   .exam-container {
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .exam-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .countdown-timer {
+    position: static;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .question-card {
+    padding: 15px;
+  }
+
+  .option-label {
+    font-size: 0.9rem;
+  }
+
+  .welcome-message {
     padding: 20px;
+    margin-top: 20px;
+  }
+
+  .welcome-message h2 {
+    font-size: 1.5rem;
+  }
+
+  .welcome-message p {
+    font-size: 1rem;
+  }
+
+  .grades-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .grades-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+
+  .grade-card {
+    padding: 15px;
+  }
+
+  .grade-card h3 {
+    font-size: 1rem;
+  }
+
+  .circular-progress {
+    width: 100px;
+    height: 100px;
   }
 }

@@ -1,69 +1,87 @@
+/* admin/dashboard/sidebar.css */
 .admin-sidebar {
-    width: 250px;
-    background-color: #f4f4f4;
-    min-height: 100vh;
-    padding: 20px;
-    border-right: 1px solid #e0e0e0;
+  width: 250px;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+  padding: 20px;
+  border-right: 1px solid #e0e0e0;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar-header h2 {
+  color: #333;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-nav-item:hover {
+  background-color: #e0e0e0;
+}
+
+.sidebar-nav-item.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.sidebar-nav-item .icon {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  background-size: cover;
+  background-position: center;
+}
+
+.icon-plus-circle {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>');
+}
+
+.icon-book {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>');
+}
+
+.icon-users {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>');
+}
+
+.icon-bar-chart {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>');
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 200px;
   }
-  
-  .sidebar-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
+
   .sidebar-header h2 {
-    color: #333;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 20px;
   }
-  
-  .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-  }
-  
+
   .sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    background-color: transparent;
-    border: none;
-    border-radius: 5px;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 10px 12px;
+    font-size: 14px;
   }
-  
-  .sidebar-nav-item:hover {
-    background-color: #e0e0e0;
-  }
-  
-  .sidebar-nav-item.active {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .sidebar-nav-item .icon {
-    margin-right: 10px;
-    width: 20px;
-    height: 20px;
-    background-size: cover;
-    background-position: center;
-  }
-  
-  .icon-plus-circle {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>');
-  }
-  
-  .icon-book {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>');
-  }
-  
-  .icon-users {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>');
-  }
-  
-  .icon-bar-chart {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>');
-  }
+}
