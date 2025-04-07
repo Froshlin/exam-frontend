@@ -159,26 +159,11 @@ export default function StudentDashboard() {
   };
 
   // Logout function
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (token) {
-        await axios.post(
-          "https://exam-backend.up.railway.app/api/auth/logout",
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Failed to log out on the server. Logging out locally.");
-    } finally {
-      localStorage.removeItem("token");
-      toast.success("Logged out successfully!");
-      router.push("/login");
-    }
+  const handleLogout = () => {
+    // Clear the token and redirect to login
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!");
+    router.push("/login");
   };
 
   // Format time as MM:SS
