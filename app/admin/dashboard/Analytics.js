@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; // Import axiosInstance
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Pie } from "react-chartjs-2";
@@ -25,9 +25,9 @@ export default function Analytics() {
     const fetchAnalytics = async () => {
       try {
         const [usersRes, coursesRes, questionsRes] = await Promise.all([
-          axios.get("https://exam-backend.up.railway.app/api/users"),
-          axios.get("https://exam-backend.up.railway.app/api/courses"),
-          axios.get("https://exam-backend.up.railway.app/api/questions"),
+          axiosInstance.get("/users"), // Use axiosInstance
+          axiosInstance.get("/courses"), // Use axiosInstance
+          axiosInstance.get("/questions"), // Use axiosInstance
         ]);
 
         const users = usersRes.data;
@@ -78,9 +78,15 @@ export default function Analytics() {
 
   const pieChartOptions = {
     responsive: true,
+    maintainAspectRatio: false, // Allow the chart to adjust its aspect ratio
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          font: {
+            size: 14, // Increase font size for legend
+          },
+        },
       },
       tooltip: {
         callbacks: {

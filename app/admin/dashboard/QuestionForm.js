@@ -1,27 +1,25 @@
+// admin/dashboard/QuestionForm.js
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './question-form.css';
+import axiosInstance from "../../utils/axiosInstance"; // Import axiosInstance
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./question-form.css";
 
 export default function QuestionForm() {
   const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState([
-    { label: "A", value: "" },
-    { label: "B", value: "" },
-    { label: "C", value: "" },
-    { label: "D", value: "" }
-  ]);
-  const [correctAnswer, setCorrectAnswer] = useState("");
+  const [formData, setFormData] = useState({
+    courseId: "",
+    text: "",
+    options: ["", "", "", ""],
+    correctAnswer: "",
+  });
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("https://exam-backend.up.railway.app/api/courses");
+        const response = await axiosInstance.get("/courses"); // Use axiosInstance
         setCourses(response.data);
       } catch (error) {
         toast.error("Failed to fetch courses", {
@@ -30,39 +28,36 @@ export default function QuestionForm() {
         });
       }
     };
-
     fetchCourses();
   }, []);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...formData.options];
+    newOptions[index] = value;
+    setFormData({ ...formData, options: newOptions });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newQuestion = {
-      courseId: selectedCourse,
-      text: question,
-      options: options.map(opt => opt.value),
-      correctAnswer,
-    };
-
     try {
-      await axios.post("https://exam-backend.up.railway.app/api/questions", newQuestion);
-
-      toast.success("Question Added Successfully!", {
+      await axiosInstance.post("/questions", formData); // Use axiosInstance
+      toast.success("Question added successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
-      
-      // Reset form
-      setSelectedCourse("");
-      setQuestion("");
-      setOptions([
-        { label: "A", value: "" },
-        { label: "B", value: "" },
-        { label: "C", value: "" },
-        { label: "D", value: "" }
-      ]);
-      setCorrectAnswer("");
+      setFormData({
+        courseId: "",
+        text: "",
+        options: ["", "", "", ""],
+        correctAnswer: "",
+      });
     } catch (error) {
-      toast.error("Failed to Add Question", {
+      toast.error("Failed to add question", {
         position: "top-right",
         autoClose: 3000,
       });
@@ -76,14 +71,15 @@ export default function QuestionForm() {
         <div className="form-group">
           <label>Course:</label>
           <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
+            name="courseId"
+            value={formData.courseId}
+            onChange={handleInputChange}
             required
           >
             <option value="">Select a course</option>
             {courses.map((course) => (
               <option key={course._id} value={course._id}>
-                {course._id}
+                {course.name}
               </option>
             ))}
           </select>
@@ -92,51 +88,46 @@ export default function QuestionForm() {
         <div className="form-group">
           <label>Question:</label>
           <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            name="text"
+            value={formData.text}
+            onChange={handleInputChange}
+            placeholder="Enter question"
             required
-            rows={4}
           />
         </div>
 
         <div className="form-group">
           <label>Options:</label>
-          {options.map((opt, index) => (
-            <div key={opt.label} className="option-input">
-              <span className="option-label">{opt.label}.</span>
-              <input
-                type="text"
-                value={opt.value}
-                onChange={(e) => {
-                  const newOptions = [...options];
-                  newOptions[index].value = e.target.value;
-                  setOptions(newOptions);
-                }}
-                required
-              />
-            </div>
+          {formData.options.map((option, index) => (
+            <input
+              key={index}
+              type="text"
+              value={option}
+              onChange={(e) => handleOptionChange(index, e.target.value)}
+              placeholder={`Option ${String.fromCharCode(65 + index)}`}
+              required
+            />
           ))}
         </div>
 
         <div className="form-group">
           <label>Correct Answer:</label>
           <select
-            value={correctAnswer}
-            onChange={(e) => setCorrectAnswer(e.target.value)}
+            name="correctAnswer"
+            value={formData.correctAnswer}
+            onChange={handleInputChange}
             required
           >
-            <option value="">Select Correct Answer</option>
-            {options.map((opt) => (
-              <option key={opt.label} value={opt.label}>
-                {opt.label}
+            <option value="">Select correct answer</option>
+            {formData.options.map((option, index) => (
+              <option key={index} value={option}>
+                {String.fromCharCode(65 + index)}. {option}
               </option>
             ))}
           </select>
         </div>
 
-        <button type="submit">
-          Add Question
-        </button>
+        <button type="submit">Add Question</button>
       </form>
       <ToastContainer />
     </div>

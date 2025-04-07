@@ -2,22 +2,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; // Import axiosInstance
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./user-management.css";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({ username: "", email: "", role: "student" });
+  const [newUser, setNewUser] = useState({ email: "", matricNumber: "", role: "student", password: "" });
   const [editingUser, setEditingUser] = useState(null);
-  const [editUserData, setEditUserData] = useState({ username: "", email: "", role: "" });
+  const [editUserData, setEditUserData] = useState({ email: "", matricNumber: "", role: "", password: "" });
 
   // Fetch users on component mount
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("https://exam-backend.up.railway.app/api/users");
+        const response = await axiosInstance.get("/users"); // Use axiosInstance
         setUsers(response.data);
       } catch (error) {
         toast.error("Failed to fetch users", {
@@ -32,18 +32,40 @@ export default function UserManagement() {
   // Add a new user
   const handleAddUser = async (e) => {
     e.preventDefault();
-    if (!newUser.username.trim() || !newUser.email.trim()) return;
+    const { email, matricNumber, role, password } = newUser;
+
+    if (!role || !password) {
+      toast.error("Role and password are required", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (role === "student" && !matricNumber) {
+      toast.error("Matric number is required for students", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+    if (role === "admin" && !email) {
+      toast.error("Email is required for admins", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
 
     try {
-      const response = await axios.post("https://exam-backend.up.railway.app/api/users", newUser);
+      const response = await axiosInstance.post("/users", newUser); // Use axiosInstance
       setUsers([...users, response.data]);
-      setNewUser({ username: "", email: "", role: "student" });
+      setNewUser({ email: "", matricNumber: "", role: "student", password: "" });
       toast.success("User added successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      toast.error("Failed to add user", {
+      toast.error("Failed to add user: " + (error.response?.data?.message || error.message), {
         position: "top-right",
         autoClose: 3000,
       });
@@ -53,27 +75,27 @@ export default function UserManagement() {
   // Start editing a user
   const handleEditUser = (user) => {
     setEditingUser(user._id);
-    setEditUserData({ username: user.username, email: user.email, role: user.role });
+    setEditUserData({
+      email: user.email || "",
+      matricNumber: user.matricNumber || "",
+      role: user.role,
+      password: "", // Don't prefill password for security
+    });
   };
 
   // Save edited user
   const handleSaveEdit = async (userId) => {
     try {
-      const response = await axios.put(
-        `https://exam-backend.up.railway.app/api/users/${userId}`,
-        editUserData
-      );
-      setUsers(
-        users.map((user) => (user._id === userId ? response.data : user))
-      );
+      const response = await axiosInstance.put(`/users/${userId}`, editUserData); // Use axiosInstance
+      setUsers(users.map((user) => (user._id === userId ? response.data : user)));
       setEditingUser(null);
-      setEditUserData({ username: "", email: "", role: "" });
+      setEditUserData({ email: "", matricNumber: "", role: "", password: "" });
       toast.success("User updated successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      toast.error("Failed to update user", {
+      toast.error("Failed to update user: " + (error.response?.data?.message || error.message), {
         position: "top-right",
         autoClose: 3000,
       });
@@ -83,14 +105,14 @@ export default function UserManagement() {
   // Delete a user
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`https://exam-backend.up.railway.app/api/users/${userId}`);
+      await axiosInstance.delete(`/users/${userId}`); // Use axiosInstance
       setUsers(users.filter((user) => user._id !== userId));
       toast.success("User deleted successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      toast.error("Failed to delete user", {
+      toast.error("Failed to delete user: " + (error.response?.data?.message || error.message), {
         position: "top-right",
         autoClose: 3000,
       });
@@ -104,26 +126,6 @@ export default function UserManagement() {
       {/* Add User Form */}
       <form onSubmit={handleAddUser} className="add-user-form">
         <div className="form-group">
-          <label>Username:</label>
-          <input
-            type="text"
-            value={newUser.username}
-            onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-            placeholder="Enter username"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            value={newUser.email}
-            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-            placeholder="Enter email"
-            required
-          />
-        </div>
-        <div className="form-group">
           <label>Role:</label>
           <select
             value={newUser.role}
@@ -132,6 +134,40 @@ export default function UserManagement() {
             <option value="student">Student</option>
             <option value="admin">Admin</option>
           </select>
+        </div>
+        {newUser.role === "student" && (
+          <div className="form-group">
+            <label>Matric Number:</label>
+            <input
+              type="text"
+              value={newUser.matricNumber}
+              onChange={(e) => setNewUser({ ...newUser, matricNumber: e.target.value })}
+              placeholder="Enter matric number"
+              required={newUser.role === "student"}
+            />
+          </div>
+        )}
+        {newUser.role === "admin" && (
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              type="email"
+              value={newUser.email}
+              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              placeholder="Enter email"
+              required={newUser.role === "admin"}
+            />
+          </div>
+        )}
+        <div className="form-group">
+          <label>Password:</label>
+          <input
+            type="password"
+            value={newUser.password}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            placeholder="Enter password"
+            required
+          />
         </div>
         <button type="submit">Add User</button>
       </form>
@@ -147,20 +183,6 @@ export default function UserManagement() {
               <li key={user._id} className="user-item">
                 {editingUser === user._id ? (
                   <>
-                    <input
-                      type="text"
-                      value={editUserData.username}
-                      onChange={(e) =>
-                        setEditUserData({ ...editUserData, username: e.target.value })
-                      }
-                    />
-                    <input
-                      type="email"
-                      value={editUserData.email}
-                      onChange={(e) =>
-                        setEditUserData({ ...editUserData, email: e.target.value })
-                      }
-                    />
                     <select
                       value={editUserData.role}
                       onChange={(e) =>
@@ -170,13 +192,41 @@ export default function UserManagement() {
                       <option value="student">Student</option>
                       <option value="admin">Admin</option>
                     </select>
+                    {editUserData.role === "student" && (
+                      <input
+                        type="text"
+                        value={editUserData.matricNumber}
+                        onChange={(e) =>
+                          setEditUserData({ ...editUserData, matricNumber: e.target.value })
+                        }
+                        placeholder="Matric Number"
+                      />
+                    )}
+                    {editUserData.role === "admin" && (
+                      <input
+                        type="email"
+                        value={editUserData.email}
+                        onChange={(e) =>
+                          setEditUserData({ ...editUserData, email: e.target.value })
+                        }
+                        placeholder="Email"
+                      />
+                    )}
+                    <input
+                      type="password"
+                      value={editUserData.password}
+                      onChange={(e) =>
+                        setEditUserData({ ...editUserData, password: e.target.value })
+                      }
+                      placeholder="New Password (optional)"
+                    />
                     <button onClick={() => handleSaveEdit(user._id)}>Save</button>
                     <button onClick={() => setEditingUser(null)}>Cancel</button>
                   </>
                 ) : (
                   <>
                     <span>
-                      {user.username} ({user.email}) - {user.role}
+                      {user.role === "student" ? user.matricNumber : user.email} - {user.role}
                     </span>
                     <div className="user-actions">
                       <button onClick={() => handleEditUser(user)}>Edit</button>

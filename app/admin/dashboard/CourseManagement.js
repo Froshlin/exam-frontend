@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance"; // Import axiosInstance
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./course-management.css";
@@ -17,7 +17,7 @@ export default function CourseManagement() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("https://exam-backend.up.railway.app/api/courses");
+        const response = await axiosInstance.get("/courses"); // Use axiosInstance
         setCourses(response.data);
       } catch (error) {
         toast.error("Failed to fetch courses", {
@@ -35,9 +35,7 @@ export default function CourseManagement() {
     if (!newCourse.trim()) return;
 
     try {
-      const response = await axios.post("https://exam-backend.up.railway.app/api/courses", {
-        name: newCourse,
-      });
+      const response = await axiosInstance.post("/courses", { name: newCourse }); // Use axiosInstance
       setCourses([...courses, response.data]);
       setNewCourse("");
       toast.success("Course added successfully!", {
@@ -61,15 +59,8 @@ export default function CourseManagement() {
   // Save edited course
   const handleSaveEdit = async (courseId) => {
     try {
-      const response = await axios.put(
-        `https://exam-backend.up.railway.app/api/courses/${courseId}`,
-        { name: editCourseName }
-      );
-      setCourses(
-        courses.map((course) =>
-          course._id === courseId ? response.data : course
-        )
-      );
+      const response = await axiosInstance.put(`/courses/${courseId}`, { name: editCourseName }); // Use axiosInstance
+      setCourses(courses.map((course) => (course._id === courseId ? response.data : course)));
       setEditingCourse(null);
       setEditCourseName("");
       toast.success("Course updated successfully!", {
@@ -87,7 +78,7 @@ export default function CourseManagement() {
   // Delete a course
   const handleDeleteCourse = async (courseId) => {
     try {
-      await axios.delete(`https://exam-backend.up.railway.app/api/courses/${courseId}`);
+      await axiosInstance.delete(`/courses/${courseId}`); // Use axiosInstance
       setCourses(courses.filter((course) => course._id !== courseId));
       toast.success("Course deleted successfully!", {
         position: "top-right",
@@ -136,23 +127,15 @@ export default function CourseManagement() {
                       value={editCourseName}
                       onChange={(e) => setEditCourseName(e.target.value)}
                     />
-                    <button onClick={() => handleSaveEdit(course._id)}>
-                      Save
-                    </button>
-                    <button onClick={() => setEditingCourse(null)}>
-                      Cancel
-                    </button>
+                    <button onClick={() => handleSaveEdit(course._id)}>Save</button>
+                    <button onClick={() => setEditingCourse(null)}>Cancel</button>
                   </>
                 ) : (
                   <>
                     <span>{course.name}</span>
                     <div className="course-actions">
-                      <button onClick={() => handleEditCourse(course)}>
-                        Edit
-                      </button>
-                      <button onClick={() => handleDeleteCourse(course._id)}>
-                        Delete
-                      </button>
+                      <button onClick={() => handleEditCourse(course)}>Edit</button>
+                      <button onClick={() => handleDeleteCourse(course._id)}>Delete</button>
                     </div>
                   </>
                 )}
