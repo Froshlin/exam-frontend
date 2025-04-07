@@ -12,7 +12,7 @@ import {
   Star,
   ClipboardList,
   BookmarkCheck,
-  LogOut, // Add LogOut icon
+  LogOut,
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -20,7 +20,6 @@ export default function StudentDashboard() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [examQuestions, setExamQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
-  const [grades, setGrades] = useState({});
   const [user, setUser] = useState(null);
   const [timeLeft, setTimeLeft] = useState(35 * 60); // 35 minutes in seconds
   const router = useRouter();
@@ -126,9 +125,15 @@ export default function StudentDashboard() {
 
       console.log("Submission response:", response.data);
 
-      const newGrades = { ...grades };
-      newGrades[selectedCourse] = response.data.score;
-      setGrades(newGrades);
+      // Refetch user data to get updated grades
+      const userResponse = await axios.get(
+        "https://exam-backend.up.railway.app/api/auth/me",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUser(userResponse.data);
+
       setExamQuestions([]);
       setSelectedCourse(null);
       setTimeLeft(0); // Reset timer
@@ -152,7 +157,6 @@ export default function StudentDashboard() {
 
   // Logout function
   const handleLogout = () => {
-    // Clear the token and redirect to login
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
     router.push("/login");
@@ -182,21 +186,26 @@ export default function StudentDashboard() {
           <h3>
             <Star size={20} /> My Grades
           </h3>
-          {Object.entries(grades).map(([courseId, grade]) => {
-            const courseName = courses.find((c) => c._id === courseId)?.name;
-            return (
-              <div key={courseId} className="grade-item">
-                <span>
-                  <ClipboardList size={16} /> {courseName}
-                </span>
-                <span>
-                  <BookmarkCheck size={16} /> {grade.toFixed(2)}%
-                </span>
-              </div>
-            );
-          })}
+          {user?.grades?.length > 0 ? (
+            user.grades.map((grade) => {
+              const courseName = courses.find(
+                (c) => c._id === grade.courseId
+              )?.name;
+              return (
+                <div key={grade.courseId} className="grade-item">
+                  <span>
+                    <ClipboardList size={16} /> {courseName || "Unknown Course"}
+                  </span>
+                  <span>
+                    <BookmarkCheck size={16} /> {grade.score.toFixed(2)}%
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            <p>No grades available yet.</p>
+          )}
         </div>
-        {/* Add Logout Button in the Sidebar */}
         <div className="sidebar-item logout-section">
           <button onClick={handleLogout} className="logout-button">
             <LogOut size={18} /> Logout
