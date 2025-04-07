@@ -46,8 +46,8 @@ export default function StudentDashboard() {
         setUser(response.data);
     
         // Fetch grades for the student
-        if (response.data.id) {
-          const gradesResponse = await axiosInstance.get(`/grades/student/${response.data.id}`);
+        if (response.data._id) {
+          const gradesResponse = await axiosInstance.get(`/grades/student/${response.data._id}`);
           console.log("Fetched grades:", gradesResponse.data);
           setGrades(gradesResponse.data);
         } else {
@@ -126,16 +126,21 @@ export default function StudentDashboard() {
 
   const submitExam = async () => {
     console.log("Submitting answers:", answers);
-
+  
     try {
       const response = await axiosInstance.post(`/exam/${selectedCourse}/submit`, { answers });
       console.log("Submission response:", response.data);
-
+  
       // Refetch grades after submission
-      const gradesResponse = await axiosInstance.get(`/grades/student/${user.id}`);
-      console.log("Fetched grades after submission:", gradesResponse.data);
-      setGrades(gradesResponse.data);
-
+      if (user?._id) {
+        const gradesResponse = await axiosInstance.get(`/grades/student/${user._id}`);
+        console.log("Fetched grades after submission:", gradesResponse.data);
+        setGrades(gradesResponse.data);
+      } else {
+        console.error("User ID is undefined");
+        toast.error("Failed to fetch grades: User ID not found");
+      }
+  
       setExamQuestions([]);
       setSelectedCourse(null);
       setTimeLeft(0);
