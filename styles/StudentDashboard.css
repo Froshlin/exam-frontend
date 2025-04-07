@@ -26,6 +26,11 @@
     box-shadow: 0 10px 30px rgba(74, 108, 247, 0.2);
     color: var(--white);
     transition: all 0.3s ease;
+    overflow-y: auto;
+    scrollbar-width: 4px;
+    scrollbar-color: var(--primary-color);
+    scroll-behavior: smooth;
+    
   }
   
   .sidebar h2 {
