@@ -44,13 +44,22 @@ export default function StudentDashboard() {
         const response = await axiosInstance.get("/auth/me");
         console.log("Fetched user:", response.data);
         setUser(response.data);
-
+    
         // Fetch grades for the student
-        const gradesResponse = await axiosInstance.get(`/grades/student/${response.data.id}`);
-        console.log("Fetched grades:", gradesResponse.data);
-        setGrades(gradesResponse.data);
+        if (response.data.id) {
+          const gradesResponse = await axiosInstance.get(`/grades/student/${response.data.id}`);
+          console.log("Fetched grades:", gradesResponse.data);
+          setGrades(gradesResponse.data);
+        } else {
+          console.error("User ID is undefined");
+          toast.error("Failed to fetch grades: User ID not found");
+        }
       } catch (error) {
-        console.error("Fetch user error:", error);
+        console.error("Fetch user error:", {
+          message: error.message,
+          response: error.response ? error.response.data : null,
+          status: error.response ? error.response.status : null,
+        });
         toast.error("Session expired. Please login again.");
         localStorage.removeItem("token");
         router.push("/login");
