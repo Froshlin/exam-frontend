@@ -6,6 +6,7 @@
   
   .admin-main-content {
     flex-grow: 1;
+    justify-items: center;
     padding: 30px;
     background-color: #ffffff;
     overflow-y: auto;

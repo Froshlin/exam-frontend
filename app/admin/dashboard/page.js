@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import QuestionForm from './QuestionForm';
-// import CourseManagement from './CourseManagement';
-// import UserManagement from './UserManagement';
-// import Analytics from './Analytics';
+import CourseManagement from './CourseManagement';
+import UserManagement from './UserManagement';
+import Analytics from './Analytics';
 import './admin-dashboard.css';
 
 export default function AdminDashboard() {
