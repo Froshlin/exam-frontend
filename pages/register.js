@@ -46,7 +46,7 @@ export default function StudentRegister() {
     }
 
     try {
-      const response = await axios.post("exam-backend.up.railway.app/api/auth/register", {
+      const response = await axios.post("https://exam-backend.up.railway.app/api/auth/register", {
         role: "student",
         matricNumber: credentials.matricNumber,
         password: credentials.password,
