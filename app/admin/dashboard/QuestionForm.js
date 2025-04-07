@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axiosInstance from "../../utils/axiosInstance"; // Import axiosInstance
+import axiosInstance from "../../../utils/axiosInstance"; // Import axiosInstance
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./question-form.css";
