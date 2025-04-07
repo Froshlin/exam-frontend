@@ -12,6 +12,7 @@ import {
   Star,
   ClipboardList,
   BookmarkCheck,
+  LogOut, // Add LogOut icon
 } from "lucide-react";
 
 export default function StudentDashboard() {
@@ -149,6 +150,31 @@ export default function StudentDashboard() {
     console.log("Selected answer:", { questionId, selectedOption });
   };
 
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        // Optionally call a logout endpoint on the backend
+        await axios.post(
+          "https://exam-backend.up.railway.app/api/auth/logout",
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out. Please try again.");
+    } finally {
+      // Clear the token and redirect to login
+      localStorage.removeItem("token");
+      toast.success("Logged out successfully!");
+      router.push("/login");
+    }
+  };
+
   // Format time as MM:SS
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -186,6 +212,12 @@ export default function StudentDashboard() {
               </div>
             );
           })}
+        </div>
+        {/* Add Logout Button in the Sidebar */}
+        <div className="sidebar-item logout-section">
+          <button onClick={handleLogout} className="logout-button">
+            <LogOut size={18} /> Logout
+          </button>
         </div>
       </div>
 
