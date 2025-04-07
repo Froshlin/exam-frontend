@@ -39,7 +39,7 @@ export default function StudentLogin() {
     }
 
     try {
-      const response = await axios.post("http://localhost:8000/api/auth/login", {
+      const response = await axios.post("exam-backend.up.railway.app/api/auth/login", {
         role: "student",
         matricNumber: credentials.matricNumber,
         password: credentials.password,

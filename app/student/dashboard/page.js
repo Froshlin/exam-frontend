@@ -34,7 +34,7 @@ export default function StudentDashboard() {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/auth/me', {
+        const response = await axios.get('exam-backend.up.railway.app/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -47,7 +47,7 @@ export default function StudentDashboard() {
 
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/courses', {
+        const response = await axios.get('exam-backend.up.railway.app/api/courses', {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Fetched courses:', response.data);
@@ -83,7 +83,7 @@ export default function StudentDashboard() {
   const startExam = async (courseId) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:8000/api/questions/${courseId}`, {
+      const response = await axios.get(`exam-backend.up.railway.app/api/questions/${courseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Fetched questions for courseId:', courseId, response.data);
@@ -103,7 +103,7 @@ export default function StudentDashboard() {
   
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/exam/${selectedCourse}/submit`, 
+        `exam-backend.up.railway.app/api/exam/${selectedCourse}/submit`, 
         { answers },
         { headers: { Authorization: `Bearer ${token}` } }
       );
