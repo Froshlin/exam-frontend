@@ -1,8 +1,7 @@
-// admin/dashboard/QuestionForm.js
 "use client";
 
 import { useState, useEffect } from "react";
-import axiosInstance from "../../../utils/axiosInstance"; // Import axiosInstance
+import axiosInstance from "../../../utils/axiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./question-form.css";
@@ -19,7 +18,7 @@ export default function QuestionForm() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axiosInstance.get("/courses"); // Use axiosInstance
+        const response = await axiosInstance.get("/courses");
         setCourses(response.data);
       } catch (error) {
         toast.error("Failed to fetch courses", {
@@ -45,7 +44,7 @@ export default function QuestionForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axiosInstance.post("/questions", formData); // Use axiosInstance
+      await axiosInstance.post("/questions", formData);
       toast.success("Question added successfully!", {
         position: "top-right",
         autoClose: 3000,
@@ -57,7 +56,7 @@ export default function QuestionForm() {
         correctAnswer: "",
       });
     } catch (error) {
-      toast.error("Failed to add question", {
+      toast.error("Failed to add question: " + (error.response?.data?.message || "Unknown error"), {
         position: "top-right",
         autoClose: 3000,
       });
@@ -120,8 +119,8 @@ export default function QuestionForm() {
           >
             <option value="">Select correct answer</option>
             {formData.options.map((option, index) => (
-              <option key={index} value={option}>
-                {String.fromCharCode(65 + index)}. {option}
+              <option key={index} value={String.fromCharCode(65 + index)}>
+                {String.fromCharCode(65 + index)}. {option || "Empty"}
               </option>
             ))}
           </select>
