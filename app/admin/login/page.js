@@ -1,8 +1,9 @@
+// admin/login/page.js
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authService } from "../../../services/api"; // Adjusted path
-import "../../../styles/admin.css"; // Your custom admin styles
+import { authService } from "../../../services/api";
+import "../../../styles/admin.css";
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({
@@ -34,7 +35,6 @@ export default function AdminLogin() {
         credentials.password
       );
 
-      // Save token and redirect
       localStorage.setItem("token", response.token);
       router.push("/admin/dashboard");
     } catch (err) {
@@ -77,10 +77,10 @@ export default function AdminLogin() {
             disabled={isLoading}
           >
             {isLoading ? (
-              <>
+              <div className="loading-container">
                 <span className="loading-text">Logging in...</span>
-                <div className="loading-spinner"></div>
-              </>
+                <span className="loading-spinner"></span>
+              </div>
             ) : (
               "Login"
             )}
