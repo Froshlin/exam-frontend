@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "../../../services/api";
 import "../../../styles/admin.css";
+import Link from "next/link";
 
 export default function AdminRegister() {
   const [credentials, setCredentials] = useState({
@@ -91,6 +92,10 @@ export default function AdminRegister() {
           <button type="submit" className="submit-button" disabled={isSubmitting}>
             {isSubmitting ? "Registering..." : "Register"}
           </button>
+
+          <div className="auth-links">
+            <Link href="/admin/login">Already have an account? Login</Link>
+          </div>
         </form>
       </div>
     </div>

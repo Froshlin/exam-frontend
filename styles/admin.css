@@ -110,6 +110,31 @@
   display: inline-block; /* Ensure it behaves as an inline element */
 }
 
+/* Anchor Links */
+.auth-links a {
+  color: #2563eb; /* Tailwind blue-500 */
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.auth-links a:hover {
+  color: #1e40af; /* Tailwind blue-700 */
+  transform: translateY(-2px);
+}
+
+.auth-links a:active {
+  transform: translateY(0);
+}
+
+/* Underline effect on hover */
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+
 /* Animations */
 @keyframes spin {
   0% { transform: rotate(0deg); }

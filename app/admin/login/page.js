@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "../../../services/api";
 import "../../../styles/admin.css";
+import Link from "next/link";
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({
@@ -85,6 +86,10 @@ export default function AdminLogin() {
               "Login"
             )}
           </button>
+
+          <div className="auth-links">
+            <Link href="/admin/register">Don't have an account? Register</Link>
+          </div>
         </form>
       </div>
     </div>
