@@ -13,7 +13,7 @@ export default function ManageQuestions() {
   const [questions, setQuestions] = useState([]);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [formData, setFormData] = useState({
-    question: "",
+    text: "",
     options: ["", "", "", ""],
     correctAnswer: "",
   });
@@ -67,7 +67,7 @@ export default function ManageQuestions() {
     console.log("Editing question:", question); // Debug log
     setEditingQuestion(question);
     setFormData({
-      question: question.question || "", // Ensure question is not undefined
+      text: question.text || "", // Ensure question is not undefined
       options: question.options || ["", "", "", ""],
       correctAnswer: question.correctAnswer || "",
     });
@@ -87,7 +87,7 @@ export default function ManageQuestions() {
   // Handle form submission for editing
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.question || formData.options.some(opt => !opt) || !formData.correctAnswer) {
+    if (!formData.text || formData.options.some(opt => !opt) || !formData.correctAnswer) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -95,7 +95,7 @@ export default function ManageQuestions() {
     try {
       await axiosInstance.put(`/questions/${editingQuestion._id}`, {
         courseId: selectedCourse,
-        question: formData.question,
+        text: formData.text,
         options: formData.options,
         correctAnswer: formData.correctAnswer,
       });
@@ -128,7 +128,7 @@ export default function ManageQuestions() {
   const handleCancelEdit = () => {
     setEditingQuestion(null);
     setFormData({
-      question: "",
+      text: "",
       options: ["", "", "", ""],
       correctAnswer: "",
     });
@@ -164,7 +164,7 @@ export default function ManageQuestions() {
             <textarea
               id="question"
               name="question"
-              value={formData.question}
+              value={formData.text}
               onChange={handleInputChange}
               placeholder="Enter question"
               required
