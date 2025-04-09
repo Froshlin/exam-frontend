@@ -77,12 +77,30 @@
     width: 200px;
   }
 
+  .sidebar-header{
+    transform: translateX(100%);
+  }
+
   .sidebar-header h2 {
     font-size: 20px;
+  }
+
+  .sidebar-nav{
+    transform: translateX(115%);
   }
 
   .sidebar-nav-item {
     padding: 10px 12px;
     font-size: 14px;
+    color: #666 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+  }
+
+  .sidebar-nav-item.active {
+    color: white !important;
+    /* Ensure active item text is white */
   }
 }

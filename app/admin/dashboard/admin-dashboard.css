@@ -55,6 +55,7 @@
     left: 0;
     height: 100%;
     width: 250px;
+    transform: translateX(-100%); /* Hide sidebar by default */
     padding-top: 105px;
     z-index: 999;
   }
