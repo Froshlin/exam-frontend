@@ -1,3 +1,4 @@
+// admin/dashboard/ManageQuestions.js
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -39,7 +40,8 @@ export default function ManageQuestions() {
         setIsLoading(true);
         try {
           const response = await axiosInstance.get(`/questions?courseId=${selectedCourse}`);
-          setQuestions(response.data);
+          console.log("Fetched questions for course", selectedCourse, ":", response.data); // Debug log
+          setQuestions(response.data.filter(q => q.courseId === selectedCourse)); // Ensure frontend filtering
         } catch (error) {
           toast.error("Failed to fetch questions");
           console.error("Error fetching questions:", error);
@@ -49,7 +51,7 @@ export default function ManageQuestions() {
       };
       fetchQuestions();
     } else {
-      setQuestions([]);
+      setQuestions([]); // Clear questions when no course is selected
     }
   }, [selectedCourse]);
 
@@ -57,15 +59,17 @@ export default function ManageQuestions() {
   const handleCourseChange = (e) => {
     setSelectedCourse(e.target.value);
     setEditingQuestion(null); // Reset editing state when course changes
+    setQuestions([]); // Clear questions when changing course
   };
 
   // Handle edit button click
   const handleEdit = (question) => {
+    console.log("Editing question:", question); // Debug log
     setEditingQuestion(question);
     setFormData({
-      question: question.question,
-      options: question.options,
-      correctAnswer: question.correctAnswer,
+      question: question.question || "", // Ensure question is not undefined
+      options: question.options || ["", "", "", ""],
+      correctAnswer: question.correctAnswer || "",
     });
   };
 
@@ -99,7 +103,7 @@ export default function ManageQuestions() {
       setEditingQuestion(null);
       // Refresh questions
       const response = await axiosInstance.get(`/questions?courseId=${selectedCourse}`);
-      setQuestions(response.data);
+      setQuestions(response.data.filter(q => q.courseId === selectedCourse));
     } catch (error) {
       toast.error("Failed to update question");
       console.error("Error updating question:", error);
