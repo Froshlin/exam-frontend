@@ -160,12 +160,12 @@ export default function ManageQuestions() {
       {editingQuestion ? (
         <form onSubmit={handleSubmit} className="edit-question-form">
           <div className="form-group">
-            <label htmlFor="question">Question:</label>
+            <label htmlFor="text">Question:</label>
             <textarea
-              id="question"
-              name="question"
+              id="text"
+              name="text"
               value={formData.text}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange(e, index)}
               placeholder="Enter question"
               required
             />
