@@ -9,6 +9,11 @@ export default function Sidebar({ activePage, onPageChange }) {
       page: 'questions' 
     },
     { 
+      icon: "edit",
+      label: "Manage Questions", 
+      page: "manage-questions" 
+    },
+    { 
       icon: 'book', 
       label: 'Course Management', 
       page: 'courses' 

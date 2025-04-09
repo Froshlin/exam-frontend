@@ -4,6 +4,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import QuestionForm from "./QuestionForm";
+import ManageQuestions from "./ManageQuestions";
 import CourseManagement from "./CourseManagement";
 import UserManagement from "./UserManagement";
 import Analytics from "./Analytics";
@@ -18,6 +19,8 @@ export default function AdminDashboard() {
     switch (activePage) {
       case "questions":
         return <QuestionForm />;
+      case "manage-questions":
+        return <ManageQuestions />;
       case "courses":
         return <CourseManagement />;
       case "users":
