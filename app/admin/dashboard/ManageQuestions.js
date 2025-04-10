@@ -78,9 +78,16 @@ export default function ManageQuestions() {
     if (index !== null) {
       const newOptions = [...formData.options];
       newOptions[index] = e.target.value;
-      setFormData({ ...formData, options: newOptions });
+      setFormData((prev) =>{
+        const updated = {...prev, options: newOptions}
+        return updated
+      });
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      const { name, value } = e.target;
+      setFormData((prev) =>{
+        const updated = { ...prev, [name]: value }
+        return updated
+      });
     }
   };
 
@@ -165,7 +172,7 @@ export default function ManageQuestions() {
               id="text"
               name="text"
               value={formData.text}
-              onChange={(e) => handleInputChange(e, index)}
+              onChange={(e) => handleInputChange(e)}
               placeholder="Enter question"
               required
             />
