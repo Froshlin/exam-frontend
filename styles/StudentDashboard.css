@@ -192,6 +192,7 @@
   margin: 0 0 10px;
   font-size: 1.1rem;
   color: var(--text-color);
+  opacity: 1 !important;
 }
 
 .option-label {
@@ -202,10 +203,13 @@
   padding: 10px;
   border-radius: 8px;
   transition: background-color 0.3s ease;
+  opacity: 1 !important;
+  color: var(--text-color);
 }
 
 .option-label:hover {
   background-color: #f0f3ff;
+  color: #000 !important;
 }
 
 .option-label input {
