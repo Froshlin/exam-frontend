@@ -58,6 +58,10 @@
     transition: all 0.3s ease;
     background-color: #f9fafb;
   }
+
+  .form-group select{
+    height: 100% !important;
+  }
   
   .form-group select:focus, 
   .form-group input:focus, 
