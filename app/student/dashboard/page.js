@@ -1,4 +1,4 @@
-// student/dashboard/page.js
+// student/dashboard/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  Printer,
 } from "lucide-react";
 import "../../../styles/StudentDashboard.css";
 
@@ -28,7 +29,7 @@ export default function StudentDashboard() {
   const [user, setUser] = useState(null);
   const [grades, setGrades] = useState([]);
   const [timeLeft, setTimeLeft] = useState(35 * 60);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar toggle
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   // Fetch user details, courses, and grades on mount
@@ -114,7 +115,7 @@ export default function StudentDashboard() {
       setSelectedCourse(courseId);
       setAnswers({});
       setTimeLeft(35 * 60);
-      setIsSidebarOpen(false); // Close sidebar when starting an exam
+      setIsSidebarOpen(false);
     } catch (error) {
       console.error(
         "Error fetching exam questions:",
@@ -165,10 +166,23 @@ export default function StudentDashboard() {
     router.push("/login");
   };
 
+  const handlePrintResults = () => {
+    window.print();
+  };
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const toggleSidebar = () => {
@@ -201,16 +215,21 @@ export default function StudentDashboard() {
             <Star size={20} /> My Grades
           </h3>
           {grades.length > 0 ? (
-            grades.map((grade) => (
-              <div key={grade._id} className="grade-item">
-                <span>
-                  <ClipboardList size={16} /> {grade.courseId.name}
-                </span>
-                <span>
-                  <BookmarkCheck size={16} /> {grade.score.toFixed(2)}%
-                </span>
-              </div>
-            ))
+            <>
+              {grades.map((grade) => (
+                <div key={grade._id} className="grade-item">
+                  <span>
+                    <ClipboardList size={16} /> {grade.courseId.name}
+                  </span>
+                  <span>
+                    <BookmarkCheck size={16} /> {grade.score.toFixed(2)}%
+                  </span>
+                </div>
+              ))}
+              <button onClick={handlePrintResults} className="print-button">
+                <Printer size={18} /> Print Results
+              </button>
+            </>
           ) : (
             <p>No grades available yet.</p>
           )}
@@ -267,6 +286,9 @@ export default function StudentDashboard() {
             {grades.length > 0 ? (
               <>
                 <h2>Your Exam Results</h2>
+                <button onClick={handlePrintResults} className="print-button">
+                  <Printer size={18} /> Print Results
+                </button>
                 <div className="grades-grid">
                   {grades.map((grade) => (
                     <div key={grade._id} className="grade-card">
@@ -298,6 +320,30 @@ export default function StudentDashboard() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Print-friendly Results View */}
+      <div className="print-results">
+        <h1>Exam Results for {user?.matricNumber || "Student"}</h1>
+        <p>Printed on: {new Date().toLocaleDateString()}</p>
+        <table className="results-table">
+          <thead>
+            <tr>
+              <th>Course Name</th>
+              <th>Score</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {grades.map((grade) => (
+              <tr key={grade._id}>
+                <td>{grade.courseId.name}</td>
+                <td>{grade.score.toFixed(2)}%</td>
+                <td>{grade.createdAt ? formatDate(grade.createdAt) : "N/A"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <ToastContainer />
